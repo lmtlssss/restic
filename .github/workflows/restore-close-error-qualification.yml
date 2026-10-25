@@ -16,8 +16,8 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: Inspect gofmt delta
-        run: gofmt -d internal/restorer/fileswriter.go internal/restorer/filerestorer.go internal/restorer/fileswriter_close_test.go
+      - name: Require gofmt
+        run: test -z "$(gofmt -l internal/restorer/fileswriter.go internal/restorer/filerestorer.go internal/restorer/fileswriter_close_test.go)"
       - name: Run delayed close regressions and existing restorer suite
         run: go test -count=1 ./internal/restorer
       - name: Run race check for close-error paths
