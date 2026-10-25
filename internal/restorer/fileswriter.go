@@ -25,7 +25,7 @@ type filesWriter struct {
 	cacheMu              sync.Mutex
 	cache                *simplelru.LRU[string, *partialFile]
 	// closeErr is protected by cacheMu: eviction callbacks run under it.
-	closeErr              error
+	closeErr error
 }
 
 type filesWriterBucket struct {
