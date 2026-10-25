@@ -1,0 +1,24 @@
+name: Restored file close-error regression (no secrets)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix-restore-report-file-close-errors-20261025
+          persist-credentials: false
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Check gofmt
+        run: test -z "$(gofmt -l internal/restorer/fileswriter.go internal/restorer/filerestorer.go internal/restorer/fileswriter_close_test.go)"
+      - name: Run delayed close regressions and existing restorer suite
+        run: go test -count=1 ./internal/restorer
+      - name: Run race check for close-error paths
+        run: go test -race -count=1 -run 'TestFilesWriterFlushReturnsCloseError|TestFilesWriterReportsEvictionCloseErrorAtFlush|TestFilesWriterHealthyFlushReturnsNilAndPreservesContents|TestRestorerPropagatesFileCloseFailure' ./internal/restorer
